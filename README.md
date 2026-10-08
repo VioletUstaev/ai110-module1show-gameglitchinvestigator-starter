@@ -1,54 +1,42 @@
 # 🎮 Game Glitch Investigator: The Impossible Guesser
 
-## 🚨 The Situation
+## 🎯 Project
 
-You asked an AI to build a simple "Number Guessing Game" using Streamlit.
-It wrote the code, ran away, and now the game is unplayable. 
-
-- You can't win.
-- The hints lie to you.
-- The secret number seems to have commitment issues.
+A number guessing game built with Streamlit. The player chooses a difficulty, guesses the secret number, and receives higher/lower hints while keeping track of attempts and score. This project investigates and repairs bugs in the game's state, hint logic, and input handling.
 
 ## 🛠️ Setup
 
 1. Install dependencies: `pip install -r requirements.txt`
-2. Run the broken app: `python -m streamlit run app.py`
+2. Run the game: `python -m streamlit run app.py`
 
 ## 🕵️‍♂️ Your Mission
 
-1. **Play the game.** Open the "Developer Debug Info" tab in the app to see the secret number. Try to win.
-2. **Find the State Bug.** Why does the secret number change every time you click "Submit"? Ask ChatGPT: *"How do I keep a variable from resetting in Streamlit when I click a button?"*
-3. **Fix the Logic.** The hints ("Higher/Lower") are wrong. Fix them.
-4. **Refactor & Test.** - Move the logic into `logic_utils.py`.
-   - Run `pytest` in your terminal.
-   - Keep fixing until all tests pass!
+The repaired game stores round data in Streamlit session state, validates guesses, and uses reusable functions from `logic_utils.py`. Run the tests with `python -m pytest tests`.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+- [x] The game lets a player guess a hidden number, receive directional hints, and track a score.
+- [x] Bugs found: misleading high/low hints, mixed numeric/string comparisons, no 1–100 input validation, and stale game/input state across rounds.
+- [x] Fixes: moved game logic to `logic_utils.py`, compared numeric values consistently, validated whole-number guesses within 1–100, reset round state and the input widget, and preserved feedback through reruns.
 
-## 📸 Demo Walkthrough
+## 🎮 Demo Walkthrough
 
-Describe your fixed game in numbered steps so a reader can follow along without watching a video:
+Example round with Normal difficulty and the debug secret set to 50:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
-
-**Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
+1. The player enters `40`; the game reports that the guess is too low and to guess higher.
+2. The player enters `70`; the game reports that the guess is too high and to guess lower.
+3. The player enters `50`; the game reports a win and displays the final score.
+4. The player selects **New Game**; attempts, score, history, and the guess field reset for the next round.
+5. An input such as `-1`, `101`, or `400-` displays an error instead of being scored as a guess.
 
 ## 🧪 Test Results
 
 ```
-# Paste your pytest output here, e.g.:
-# pytest tests/
-# ========================= X passed in 0.XXs =========================
+$ .venv\Scripts\python.exe -m pytest tests
+tests\test_game_logic.py .......                                         [100%]
+============================== 7 passed in 0.06s ==============================
 ```
 
 ## 🚀 Stretch Features
 
-- [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+- No stretch features completed.
