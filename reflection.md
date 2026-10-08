@@ -22,18 +22,13 @@ Document at least 3 bugs you found. Add rows as needed.
 
 ## 2. How did you use AI as a teammate?
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
+Copilot helped identify the Streamlit state issue and move game rules into `logic_utils.py`. Its first suggestion was to switch to `.venv-1`, where Streamlit was installed, but Pylance continued using `.venv`, so that alone did not fix the import; installing Streamlit in the active `.venv` cleared the diagnostic. The logic refactor and validation changes were checked with pytest and a Streamlit `AppTest` interaction check. This showed me to verify that a proposed environment change actually changed the interpreter in use rather than assuming it did.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
-- How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
-- Did AI help you design or understand any tests? How?
+I ran `python -m pytest tests`; all 7 tests passed, including tests for valid bounds, out-of-range input, non-integer input, and numeric high/low comparisons. A Streamlit `AppTest` check verified that `-1` shows an error without consuming an attempt, New Game resets the game and input, and submitting `25` adds exactly one guess and clears the field. That UI check also caught that an immediate rerun hid feedback, so feedback is now kept in session state and shown after the rerun. Pylance reports no diagnostics in the edited Python files.
 
 ---
 
