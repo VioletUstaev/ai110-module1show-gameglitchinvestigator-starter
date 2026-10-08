@@ -4,43 +4,36 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 
 ## 1. What was broken when you started?
 
-- What did the game look like the first time you ran it?
-- List at least two concrete bugs you noticed at the start  
-  (for example: "the hints were backwards").
+The game launched, but its feedback did not reliably match the guess. The high/low hint text was backwards, and comparing a guess with a secret that alternated between an integer and a string could produce incorrect results. Out-of-range guesses such as `-1` were accepted, and starting a new game could leave old game state or the previous input behind.
 
 **Bug Reproduction Log**
 
-Document at least 3 bugs you found. Add rows as needed.
-
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
-| | | | |
-| | | | |
-| | | | |
+| With secret 24, guess 23 | Say the guess is too low and tell the player to guess higher | Hint text could say “Go LOWER!” even though the guess was lower | None |
+| Enter `-1` (or a number above 100, such as `400`) | Show an out-of-range error; do not score or count an attempt | The value was accepted and treated as a low/high guess | None |
+| Submit a guess, then start a new game or submit another guess | Start with a blank input and record each submitted guess once | Previous text/state could remain, making the input feel one turn behind or duplicated in history | None |
 
 ---
 
 ## 2. How did you use AI as a teammate?
 
-Copilot helped identify the Streamlit state issue and move game rules into `logic_utils.py`. Its first suggestion was to switch to `.venv-1`, where Streamlit was installed, but Pylance continued using `.venv`, so that alone did not fix the import; installing Streamlit in the active `.venv` cleared the diagnostic. The logic refactor and validation changes were checked with pytest and a Streamlit `AppTest` interaction check. This showed me to verify that a proposed environment change actually changed the interpreter in use rather than assuming it did.
+I used Copilot in VS Code to investigate the import warning, refactor game rules into `logic_utils.py`, and test the UI behavior. One suggestion was to switch to `.venv-1`, where Streamlit was installed; it was not an effective fix in this workspace because Pylance remained on `.venv`, so I instead installed Streamlit in the active environment and confirmed the import diagnostic cleared. A useful suggestion was to reset the game fields and change the text-input widget key; Streamlit `AppTest` verified the new game reset and cleared input. I also used `AppTest` to check the behavior after reruns rather than assuming the UI feedback remained visible.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
-I ran `python -m pytest tests`; all 7 tests passed, including tests for valid bounds, out-of-range input, non-integer input, and numeric high/low comparisons. A Streamlit `AppTest` check verified that `-1` shows an error without consuming an attempt, New Game resets the game and input, and submitting `25` adds exactly one guess and clears the field. That UI check also caught that an immediate rerun hid feedback, so feedback is now kept in session state and shown after the rerun. Pylance reports no diagnostics in the edited Python files.
+I ran `.venv\Scripts\python.exe -m pytest tests`; all 7 tests passed, covering the inclusive input bounds, out-of-range and non-integer inputs, and high/low comparisons. A Streamlit `AppTest` interaction check verified that `-1` shows an error without consuming an attempt, New Game resets the score/history/status and clears the input, and submitting `25` records exactly one guess and clears the field. That UI check initially exposed a feedback message disappearing on rerun, so I kept the feedback in session state and reran the check successfully. Pylance reported no diagnostics in `app.py`, `logic_utils.py`, or `tests/test_game_logic.py`.
 
 ---
 
 ## 4. What did you learn about Streamlit and state?
 
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+Streamlit reruns a script from the top when a user interacts with a widget. Values that should survive those reruns, such as the secret number, score, and attempts, belong in `st.session_state`; otherwise they may be recreated or lost. Widget keys also identify a particular input, so assigning a new key is a way to present a fresh input after a new round or submission.
 
 ---
 
 ## 5. Looking ahead: your developer habits
 
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+I want to keep writing small tests for boundary cases and then exercising the actual UI path, because the UI check found a rerun problem that the logic tests could not catch. Next time, I would check which interpreter VS Code is actually using before changing environments, and I would work through and commit each assignment phase separately. This project reminded me that AI-generated code and suggestions need to be reviewed against the codebase and verified with tests; a plausible change is not proof that the bug is fixed.
